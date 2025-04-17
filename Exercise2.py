@@ -168,13 +168,14 @@ def visualise_individual(genotype):
 
 def main():
     # %% Understanding the world
-    genotype = [0.3, 0.2, 0.1,
-                0.3, 0.2, 0.1]
-    visualise_individual(genotype)
 
     # %% Defining environment
     world = PassiveWalkerWorld()
     n_parameters = world.n_params
+
+    genotype = [0.3, 0.2, 0.1,
+                0.3, 0.2, 0.1]
+    visualise_individual(genotype)
 
     results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'CMAES')
 
