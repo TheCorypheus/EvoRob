@@ -39,7 +39,7 @@ class CheetahWorld(World):
         state_space = self.env.observation_space.shape[0]  # https://gymnasium.farama.org/environments/mujoco/half_cheetah/#observation-space
         self.controller = MLP.NNController(state_space, action_space)
         self.dt = self.env.get_wrapper_attr('dt')
-        self.n_params = action_space * state_space + action_space  # TODO
+        self.n_params = 391  # TODO
 
     def geno2pheno(self, genotype):
         self.controller.geno2pheno(genotype)
@@ -99,11 +99,11 @@ def main():
     n_parameters = world.n_params
 
     # TODO: improve the ES settings
-    CMAES_opts["min"] = -10
-    CMAES_opts["max"] = 10
-    CMAES_opts["num_parents"] = 100
-    CMAES_opts["num_generations"] = 100
-    CMAES_opts["mutation_sigma"] = 2.5
+    CMAES_opts["min"] = -8
+    CMAES_opts["max"] = 8
+    CMAES_opts["num_parents"] = 15
+    CMAES_opts["num_generations"] = 150
+    CMAES_opts["mutation_sigma"] = 3.8
 
     population_size = 50
 
@@ -118,12 +118,14 @@ def main():
 
     generate_best_individual_video(world.controller)
 
+    print("part 1 done")
+
     # %% Compare with PPO
     env = gym.make(ENV_NAME)
     ppo = PPO("MlpPolicy", env, device=torch.device('cpu'))
     trial_time = 50  # seconds in simulation
     n_sim_steps = int(trial_time / world.dt)
-    n_total_steps = 100  # TODO
+    n_total_steps = 1000  # TODO
     ppo.learn(total_timesteps=n_total_steps)
     ppo_controller = PPO_controller(ppo)
 
@@ -140,7 +142,6 @@ def main():
 
     print(np.sum(rewards_list))
     env.close()
-
 
 if __name__ == '__main__':
     main()
