@@ -168,30 +168,28 @@ def visualise_individual(genotype):
 
 def main():
     # %% Understanding the world
-
+    genotype = [0.3, 0.2, 0.1,
+                0.3, 0.2, 0.1]
+    visualise_individual(genotype)
     # %% Defining environment
     world = PassiveWalkerWorld()
     n_parameters = world.n_params
 
-    genotype = [0.3, 0.2, 0.1,
-                0.3, 0.2, 0.1]
-    visualise_individual(genotype)
-
     results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'CMAES')
 
     CMAES_opts["min"] = 0
-    CMAES_opts["max"] = 0.5
-    CMAES_opts["num_parents"] = 100
-    CMAES_opts["num_generations"] = 100
-    CMAES_opts["mutation_sigma"] = 0.33
+    CMAES_opts["max"] = 0.4
+    CMAES_opts["num_parents"] = 18
+    CMAES_opts["num_generations"] = 120
+    CMAES_opts["mutation_sigma"] = 0.3
 
-    population_size = 100
+    population_size = 40
 
     ea = CMAES(population_size, n_parameters, CMAES_opts, results_dir)
-
+    print("running")
     # %% Optimise
     run_EA(ea, world)
-
+    print("done")
     # %% visualise
     # TODO: Make a video of the best individual, and plot the fitness curve.
     best_individual = np.load(os.path.join(results_dir, f"{CMAES_opts["num_generations"]-1}", "x_best.npy"))

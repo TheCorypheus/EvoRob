@@ -132,15 +132,16 @@ class PassiveWalkerEnv(MujocoEnv, utils.EzPickle):
 
     def step(self, action):
         xy_position_before = self.data.body(self._main_body).xpos[:2].copy()
+        z_pos_before = self.data.qpos[2]
         if self.body_ids is not None:
             self.apply_force()
         self.do_simulation(action, self.frame_skip)
         xy_position_after = self.data.body(self._main_body).xpos[:2].copy()
-
+        z_pos_after = self.data.qpos[2]
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
-
-        forward_reward = x_velocity * self._forward_reward_weight
+        z_vel = (z_pos_before - z_pos_after) / self.dt
+        forward_reward = x_velocity * self._forward_reward_weight - y_velocity * self._forward_reward_weight - z_vel * 8 * self._forward_reward_weight
 
         #TODO
         reward = forward_reward
@@ -162,7 +163,6 @@ class PassiveWalkerEnv(MujocoEnv, utils.EzPickle):
             print(ValueError(f'MuJoCo Warning: Nan, Inf or huge value in QACC at DOF {DOF}'))
             terminated = True
         if self.data.qpos[2] < self.init_z_offset + 0.25 - self.data.qpos[0]*np.tan(5*np.pi/180):
-            print(f"Walker Fell off the platform at {self.data.qpos[0]} meter!!")
             terminated = True
         if np.abs(self.data.qpos[0] - self.previous_state[0])<1e-4:
             self.stuck += 1
